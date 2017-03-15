@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../bower_components/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="../static/global.css">
+    <link rel="stylesheet" href="../static/index.css">
 </head>
 <body>
 <nav class="navbar navbar-inverse" role="navigation">
@@ -26,8 +27,13 @@
                     <a href="/">Projects</a>
                 </li>
                 <li>
-                    <a href="joinGroup">Groups</a>
+                    <a href="/joinGroup">Groups</a>
                 </li>
+                {% if role == 'admin' %}
+                <li>
+                    <a href="/assign">Assign</a>
+                </li>
+                {% end %}
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
@@ -56,17 +62,106 @@
 <div class="projects">
     <div class="single-project">
         <div class="container">
+            <div class="sort-filter">
+                <div class="row">
+                    <div class="col-md-12 filter">
+                        <label class="title-filter">FILTER :</label>
+                        <ul class="options-filter">
+                            <li class="btn{% if not flt %} active{% end %}"><a href="/"><font color="black">All</font> </a> </li>
+                            <li class="btn{% if flt=='ece' %} active{% end %}"><a href="/filter/ece"><font color="black">ECE</font> </a> </li>
+                            <li class="btn{% if flt=='me' %} active{% end %}"><a href="/filter/me"><font color="black">ME</font> </a> </li>
+                            <li class="btn{% if flt=='other' %} active{% end %}"><a href="/filter/other"><font color="black">Other</font> </a> </li>
+                        </ul>
+                    </div>
+                </div>
+                <!--<div class="row">
+                    <div class="col-md-9 col-md-offset-2 sort">
+                        <ul class="options-sort pull-right">
+                            <li>
+                                <a href="#" class="sort-opt">Upload Date</a>
+                                <span class="sort-divider">|</span>
+                            </li>
+                            <li>
+                                <a href="#" class="sort-opt active">View Count</a>
+                                <span class="sort-divider">|</span>
+                            </li>
+                            <li>
+                                <a href="#" class="sort-opt">Sort 3</a>
+                                <span class="sort-divider">|</span>
+                            </li>
+                            <li>
+                                <a href="#" class="sort-opt">Sort 4</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>-->
+            </div>
+            <!-- header -->
+            <div class="header row">
+              <div class="col-md-4">
+                  <p>
+                      <span>Project</span>
+                      <a href="?sort={% if sort == 'up' %}down{% else %}up{% end %}&name=title"><i class="fa fa-sort" aria-hidden="true"></i></a>
+                  </p>
+              </div>
+              <div class="col-md-2">
+                  <p>
+                      <span>Instructor</span>
+                      <a href="?sort={% if sort == 'up' %}down{% else %}up{% end %}&name=instructor"><i class="fa fa-sort" aria-hidden="true"></i></a>
+                  </p>
+              </div>
+              <div class="col-md-2">
+                  <p>
+                      <span>First Choice</span>
+                      <a href="?sort={% if sort == 'up' %}down{% else %}up{% end %}&name=fchoice"><i class="fa fa-sort" aria-hidden="true"></i></a>
+                  </p>
+              </div>
+              <div class="col-md-2">
+                  <p>
+                      <span>Second Choice</span>
+                      <a href="?sort={% if sort == 'up' %}down{% else %}up{% end %}&name=schoice"><i class="fa fa-sort" aria-hidden="true"></i></a>
+                  </p>
+              </div>
+              <div class="col-md-2">
+                  <p>
+                      <span>Third Choice</span>
+                      <a href="?sort={% if sort == 'up' %}down{% else %}up{% end %}&name=tchoice"><i class="fa fa-sort" aria-hidden="true"></i></a>
+                  </p>
+              </div>
+                <div class="col-md-2">
+                  <p>
+                      <span>Sponsor</span>
+                      <a href="?sort={% if sort == 'up' %}down{% else %}up{% end %}&name=sponsor"><i class="fa fa-sort" aria-hidden="true"></i></a>
+                  </p>
+              </div>
+            </div>
+            <!-- projects -->
             {% for item in projs %}
-            <div class="row">
-                <div class="col-md-4 col-md-offset-2">
+            <div class="proj row">
+                <div class="col-md-2">
                     <a href="/proj/{{ item['id'] }}">
-                        <img class="thumbnail img-responsive" src="img/{{ item['img'] }}">
+                        <img class="thumbnail img-responsive" src="/img/{{ item['img'] }}">
                     </a>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-2">
                     <a href="/proj/{{ item['id'] }}">
                         <p>{{ item['title'] }}</p>
                     </a>
+                </div>
+                <div class="col-md-2">
+                    <p>{{ item['instructor'] }}</p>
+                </div>
+                <div class="col-md-2">
+                    <p>{{ item['chosen_num1'] }} Groups, {{ person_num(item['wish1']) }} students</p>
+                </div>
+                <div class="col-md-2">
+                    <p>{{ item['chosen_num2'] }} Groups, {{ person_num(item['wish2']) }} students</p>
+                </div>
+                <div class="col-md-2">
+                    <p>{{ item['chosen_num3'] }} Groups, {{ person_num(item['wish3']) }} students</p>
+                </div>
+                <div class="col-md-2">
+                    <p>{{ item['sponsor'] }}</p>
                 </div>
             </div>
             {% end %}

@@ -8,6 +8,39 @@
     <link rel="stylesheet" href="../bower_components/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="../static/global.css">
     <link rel="stylesheet" href="../static/groups.css">
+    <script src="http://lib.sinaapp.com/js/jquery/1.9.1/jquery-1.9.1.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $("#join").click(function(){
+                $.post("/joinGroup",
+                    {
+                        gid: $(this).val()+1,
+                        method: "join"
+                    },
+                    function(data,status){
+                    alert(data);
+                });
+            });
+            $("#leave").click(function(){
+                $.post("/joinGroup",
+                    {
+                        method: "quit"
+                    },
+                    function(data,status){
+                    alert(data);
+                });
+            });
+            $("#create").click(function(){
+                $.post("/joinGroup",
+                    {
+                        method: "create"
+                    },
+                    function(data,status){
+                    alert(data);
+                });
+            });
+        });
+    </script>
 </head>
 <body>
 <nav class="navbar navbar-inverse" role="navigation">
@@ -27,8 +60,13 @@
                     <a href="/">Projects</a>
                 </li>
                 <li class="active">
-                    <a href="joinGroup">Groups</a>
+                    <a href="/joinGroup">Groups</a>
                 </li>
+                {% if role == 'admin' %}
+                <li>
+                    <a href="/assign">Assign</a>
+                </li>
+                {% end %}
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
@@ -57,31 +95,126 @@
 </nav>
 <div class="contents groups">
     <div class="container-fluid">
+        {% if role == 'stu' %}
+        {% if stat == 'n' %}
+        <button class="btn btn-success" data-toggle="modal" data-target="#leave-modal">Create a new group</button>
+                  <div class="modal fade" id="leave-modal">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                          <h4>Confirmation</h4>
+                        </div>
+                        <div class="modal-body">
+                          Are you sure to create a new group?
+                        </div>
+                        <div class="modal-footer" align="center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                          <button type="button" class="btn btn-primary" id="create">Confirm</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+        {% elif stat == 'l' %}
+        <button class="btn btn-warning" data-toggle="modal" data-target="#leave-modal">Delete your group</button>
+                  <div class="modal fade" id="leave-modal">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                          <h4>Confirmation</h4>
+                        </div>
+                        <div class="modal-body">
+                          Are you sure to delete your group?
+                        </div>
+                        <div class="modal-footer" align="center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                          <button type="button" class="btn btn-primary" id="leave">Confirm</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+        {% end %}
+        {% end %}
         <table class="table table-striped">
-            <thead>
+            <thead class="table-head">
             <tr>
-                <td>Group No.</td>
-                <td>Group Leader</td>
-                <td>Group Members</td>
-                <td></td>
+              <td class="gro-no">Group No.</td>
+              <td class="gro-led">Group Leader</td>
+              <td class="gro-mem">Group Members</td>
+                {% if role == 'stu' %}
+              <td>Join / Leave</td>
+                {% end %}
             </tr>
             </thead>
             <tbody>
             {% for i in range(l) %}
             <tr>
-                <td>{{ i+1 }}</td>
-                <td>{{ groups[i]['leader'] }}</td>
-                <td>{{ groups[i]['users'] }}</td>
-                {% if stat=='n' and role=='stu' %}
+                <td>{{ i + 1 }}</td>
                 <td>
-                    {% if groups[i]['isFull']==False %}
-                    <button class="btn btn-default">Request to Join</button>
+                    {% if role == 'admin' %}
+                    <a href="/member/{{ groups[i]['leader_id'] }}"> {{ groups[i]['leader'] }}</a>
                     {% else %}
-                    <button class="btn btn-default">The group is full</button>
+                    {{ groups[i]['leader'] }}
+                    {% end %}
+                </td>
+                <td>{% for j in range(len(split(groups[i]['users']))) %}
+                    {% if role == 'admin' %}
+                    <a href="/member/{{ split(groups[i]['user_id'])[j] }}"> {{ split(groups[i]['users'])[j] }}</a>
+                    {% else %}
+                    {{ split(groups[i]['users'])[j] }}
+                    {% end %}
+                    <br>
+                    {% end %}
+                </td>
+                {% if role == 'stu' %}
+                <td>
+                    {% if gid != groups[i]['id'] %}
+                    {% if groups[i]['isFull'] %}
+                  <button class="btn btn-success" disabled="disabled">Full</button>
+                    {% else %}
+                  <button class="btn btn-success" data-toggle="modal" data-target="#join-modal">Join</button>
+                  <div class="modal fade" id="join-modal">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                          <h4>Confirmation</h4>
+                        </div>
+                        <div class="modal-body">
+                          Are you sure to join the group?
+                        </div>
+                        <div class="modal-footer" align="center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                          <button type="button" class="btn btn-primary" value={{ i }} id="join">Confirm</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                    {% end %}
+                    {% else %}
+                  <button class="btn btn-warning" data-toggle="modal" data-target="#leave-modal">Leave</button>
+                  <div class="modal fade" id="leave-modal">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                          <h4>Confirmation</h4>
+                        </div>
+                        <div class="modal-body">
+                          Are you sure to leave the group? {% if stat == 'l' %} If you leave the group, the group will be dismissed. {% end %}
+                        </div>
+                        <div class="modal-footer" align="center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                          <button type="button" class="btn btn-primary" id="leave">Confirm</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                     {% end %}
                 </td>
                 {% end %}
-            </tr>
+              </tr>
             {% end %}
             </tbody>
         </table>

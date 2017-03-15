@@ -39,8 +39,19 @@
     <div class="container-fluid">
         <div class="panel panel-default">
             <div class="panel-body">
-                <form role="form" action="/login" method="post">
-                    <p><a href="/jalogin">Jaccount Login</a> </p>
+                <form role="form" action="/userregister" method="post">
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">Major</label>
+                        <input name="major" class="form-control" id="exampleInputPassword1" placeholder="ECE or ME?">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">Phone Number</label>
+                        <input name="phone" class="form-control" id="exampleInputPassword1" placeholder="12345678912">
+                    </div>
+                    <div class="form-group" style="display: none">
+                        <input name="next" class="form-control" value="{{ next }}">
+                    </div>
+                    <button type="submit" value="Sign in" class="btn btn-default btn-login-submit">Register</button>
                 </form>
             </div>
         </div>
